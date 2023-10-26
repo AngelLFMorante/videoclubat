@@ -1,4 +1,4 @@
-package com.videoclubat.videoclubat;
+package com.videoclubat.videoclubat.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +8,6 @@ public class VideoclubatApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(VideoclubatApplication.class, args);
-		System.out.println("Hola Mundo");
 	}
 
 }
