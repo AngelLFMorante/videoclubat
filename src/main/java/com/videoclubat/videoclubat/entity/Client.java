@@ -1,23 +1,25 @@
 package com.videoclubat.videoclubat.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
 @Table(name = "cliente")
-public class Client implements Serializable{
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class Client {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     @Column(name = "nombre")
     private String firstname;
     @Column(name = "apellidos")
@@ -28,6 +30,10 @@ public class Client implements Serializable{
     private String phone;
     private String email;
 
-    @OneToMany(mappedBy = "client")
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            mappedBy = "client"
+    )
+    @JsonManagedReference
     private List<Rent> rents;
 }

@@ -1,21 +1,18 @@
 package com.videoclubat.videoclubat.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
 @Table(name = "alquiler")
-public class Rent implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 4L;
+public class Rent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +20,12 @@ public class Rent implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente", nullable = false)
+    @JsonBackReference
     private Client client;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_pelicula", nullable = false)
+    @JsonBackReference
     private Film film;
 
     @Column(name = "alquilado")

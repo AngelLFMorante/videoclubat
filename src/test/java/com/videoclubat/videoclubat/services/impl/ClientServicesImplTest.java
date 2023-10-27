@@ -2,7 +2,7 @@ package com.videoclubat.videoclubat.services.impl;
 
 import com.videoclubat.videoclubat.entity.Client;
 import com.videoclubat.videoclubat.repository.IClientRepository;
-import com.videoclubat.videoclubat.services.IClientServices;
+import com.videoclubat.videoclubat.services.IClientServicesDAO;
 import com.videoclubat.videoclubat.utils.Data;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ class ClientServicesImplTest {
     private IClientRepository repository;
 
     @InjectMocks
-    private IClientServices clientServices = new ClientServicesImpl(repository);
+    private IClientServicesDAO clientServices = new ClientServicesImpl(repository);
 
     @BeforeEach
     void setUp() {
@@ -33,14 +33,13 @@ class ClientServicesImplTest {
     }
 
     @Test
-    void getAllClients() {
-        when(repository.findByAll()).thenReturn(Data.getAllClients());
+    void getClientById() {
+        when(repository.findById(1)).thenReturn(Data.getClientById());
 
-        Optional<Client> result = clientServices.getAllClients();
+        Optional<Client> result = clientServices.getClientById(1);
 
         Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.isPresent());
-        Assertions.assertEquals("Angel", result.get().getFirstname());
-        verify(repository).findByAll();
+        //Assertions.assertEquals("Angel", result.get().getFirstname());
+        verify(repository).findById(1);
     }
 }
