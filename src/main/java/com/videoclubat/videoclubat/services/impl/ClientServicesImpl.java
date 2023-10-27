@@ -1,8 +1,11 @@
 package com.videoclubat.videoclubat.services.impl;
 
+import com.videoclubat.videoclubat.dto.ClientDTO;
 import com.videoclubat.videoclubat.entity.Client;
+import com.videoclubat.videoclubat.mapper.IClientMapper;
 import com.videoclubat.videoclubat.repository.IClientRepository;
 import com.videoclubat.videoclubat.services.IClientServicesDAO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +18,13 @@ import java.util.Optional;
 @Transactional
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ClientServicesImpl implements IClientServicesDAO {
 
     final static Logger logger = LoggerFactory.getLogger(ClientServicesImpl.class);
 
-    private IClientRepository repository;
-
-    public ClientServicesImpl(IClientRepository repository) {
-        this.repository = repository;
-    }
+    private final IClientRepository repository;
+    private final IClientMapper mapper;
 
     @Override
     public List<Client> getAllClients() {
@@ -32,12 +33,12 @@ public class ClientServicesImpl implements IClientServicesDAO {
     }
 
     @Override
-    public Optional<Client> getClientById(int id) {
+    public ClientDTO getClientById(int id) {
         Optional<Client> client = repository.findById(id);
         if(client.isEmpty()){
              logger.error("No existe cliente");
         }
-        return client;
+        return mapper.mapperClientToDto(client.get());
     }
 
 }
