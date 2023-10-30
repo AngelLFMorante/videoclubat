@@ -58,22 +58,16 @@ public class ClientServicesImpl implements IClientServices {
     }
 
     @Override
-    public ClientDTO getClientById(long id) {
-        /*
-        Comprobamos los datos que trae el controlador desde el usuario,ç
-        Comprobamos que no sea un numero negativo o 0, ya que la base de datos no contempla numeros negativos o 0
-         */
-        if(id == 0 || id < 0 ){
-            logger.error("ClientServicesImpl, Method: getClientById - La id del usuario es de valor negativo o 0");
-            throw new ClientBadRequestException();
-        }
-
+    public ClientDTO getClientById(Long id) {
+        //Comprobamos que sea un id correcto.
+        checkIdIsCorrect(id);
         /*
         Llamamos al repository para traer los datos del cliente
         He declarado como Optional la respuesta, me resulta mas comodo detectar valores nulos
         También podría haber remarcado repostory.findById(id).orElse(null), o lanzar exception
         Cada servicio de los 4 se hace de forma distinta para ver varias soluciones.
          */
+        logger.info("ClientServicesImpl, Method: getClientById - Extraemos al cliente con id " + id);
         Optional<Client> clientFound = repository.findById(id);
         Client client = null;
         //Comprobamos que tenemos cliente en base de datos si no, lanzamos exception
@@ -85,6 +79,76 @@ public class ClientServicesImpl implements IClientServices {
         }
 
         return mapper.mapperClientToDto(client);
+    }
+
+    private void checkIdIsCorrect(Long id) {
+        logger.info("ClientServicesImpl, Method: checkIdIsCorrect - Comprobamos que sea una id correcta.");
+        /*
+        Comprobamos los datos que trae el controlador desde el usuario,
+        Como vamos a comprobarlo en varios metodos, abstraemos la comprobacion en otro metodo.
+        Comprobamos que no sea un numero negativo o 0, ya que la base de datos no contempla numeros negativos o 0
+         */
+        if(id == 0 || id < 0 ){
+            logger.error("ClientServicesImpl, Method: getClientById - La id del usuario es de valor negativo o 0");
+            throw new ClientBadRequestException();
+        }
+    }
+
+    @Override
+    public ClientDTO addClient(Client client) {
+        logger.info("ClientServicesImpl, Method: addClient - creamos un nuevo cliente");
+        return mapper.mapperClientToDto(repository.save(client));
+    }
+
+    @Override
+    public ClientDTO editClient(Long id, Client editClient) {
+        logger.info("ClientServicesImpl, Method: editClient - Comprobamos que sea una id correcta.");
+        //Comprobamos que sea un id correcto.
+        checkIdIsCorrect(id);
+        /*
+        Si existe el usuario lo vamos a actualizar,
+        Si el usuario no existe, y queremos si o si actualizar, podemos utilizar:
+        repository.findById(id).orElseThrow(()-> new ClientNotFoundException(id))
+        pero en este caso, vamos hacer que si no existe, hacemos una llamada al metodo addClient y
+        annadimos como un nuevo cliente
+         */
+        logger.info("ClientServicesImpl, Method: editClient - si existe el cliente, se actualiza los datos si no, se crea usuario nuevo.");
+        Client updateClient = repository.findById(id).orElse(null);
+
+        if(updateClient == null){
+            return addClient(editClient);
+        }else{
+            updateClient.setFirstname(editClient.getFirstname());
+            updateClient.setSurname(editClient.getSurname());
+            updateClient.setAddress(editClient.getAddress());
+            updateClient.setPhone(editClient.getPhone());
+            updateClient.setEmail(editClient.getEmail());
+        }
+
+        /*
+        nos remalca un warning de que posiblemente podría llegarnos como null,
+        pero como ya hacemos la comprobación mas arriba, lo tenemos controlado.
+        */
+        return mapper.mapperClientToDto(repository.save(updateClient));
+    }
+
+    @Override
+    public void deleteClientById(Long id) {
+        logger.info("ClientServicesImpl, Method: checkIdIsCorrect - Comprobamos que sea una id correcta.");
+        //Comprobamos que sea un id correcto.
+        checkIdIsCorrect(id);
+        /*
+        Vamos a comprobar que existe el usuario para poder eliminar,
+        en el caso de que no exista ese id, se lo devolvemos como badRequest,
+        en el caso de que exista, se devuelve una respuesta sin contenido.
+         */
+        logger.info("ClientServicesImpl, Method: deleteClientById - eliminamos al usuario si existe si no lanzamos exception");
+        if(repository.findById(id).isPresent()){
+            //No devolvemos nada, es una respuesta sin contenido.
+            repository.deleteById(id);
+        }else{
+            throw new ClientNotFoundException(id);
+        }
     }
 
 }

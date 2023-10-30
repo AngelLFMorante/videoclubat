@@ -10,6 +10,8 @@ import java.util.Optional;
 @Repository
 public interface IClientRepository extends CrudRepository<Client, Long> {
 
-    Optional<Client> findById(int id);
+    Optional<Client> findById(Long id);
     List<Client> findAll();
+    Client save(Client client);
+    void deleteById(Long id);
 }
