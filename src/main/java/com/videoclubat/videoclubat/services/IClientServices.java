@@ -7,5 +7,5 @@ import java.util.List;
 public interface IClientServices {
 
     List<ClientDTO> getAllClients();
-    ClientDTO getClientById(int id);
+    ClientDTO getClientById(long id);
 }

@@ -33,8 +33,8 @@ public class ClientController {
     }
 
     @GetMapping("/client/{id}")
-    private ResponseEntity<Object> getClientById(@PathVariable int id){
-        logger.info("ClientController, Method: getClientById - call method getClientById with id is: ", id);
+    private ResponseEntity<Object> getClientById(@PathVariable long id){
+        logger.info("ClientController, Method: getClientById - call method getClientById with id is: " + id);
         ClientDTO client = services.getClientById(id);
         return new ResponseEntity<>(client, HttpStatus.OK);
     }

@@ -5,6 +5,8 @@ import com.videoclubat.videoclubat.entity.Client;
 import com.videoclubat.videoclubat.mapper.IClientMapper;
 import com.videoclubat.videoclubat.repository.IClientRepository;
 import com.videoclubat.videoclubat.services.IClientServices;
+import com.videoclubat.videoclubat.services.exception.clientexception.ClientBadRequestException;
+import com.videoclubat.videoclubat.services.exception.clientexception.ClientNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -39,16 +41,10 @@ public class ClientServicesImpl implements IClientServices {
         traemos un objeto de tipo Client
         */
         List<Client> clients = repository.findAll();
-
         /*
-        Controlamos y comprobamos que haya datos desde la base de datos,
-        en el caso de que no haya datos enviamos una Exception
+        No vamos a comprobar si viene vacia la lista o null, ya que lo retornamos como un status 200 emptyList
+        Por que? porque solo capturamos exception si un unico resultado no hay datos
          */
-        if(clients.isEmpty()){
-            logger.error("ClientServicesImpl, Method: getAllClients - No se ha encontrado clientes en la base de datos");
-            //ErrorHandler
-        }
-
         logger.info("ClientServicesImpl, Method: getAllClients - Mapeamos datos de los clientes a DTO");
         /*
         Creamos un Objeto de tipo List y con los datos extraidos del repository vamos
@@ -62,14 +58,14 @@ public class ClientServicesImpl implements IClientServices {
     }
 
     @Override
-    public ClientDTO getClientById(int id) {
+    public ClientDTO getClientById(long id) {
         /*
         Comprobamos los datos que trae el controlador desde el usuario,ç
         Comprobamos que no sea un numero negativo o 0, ya que la base de datos no contempla numeros negativos o 0
          */
         if(id == 0 || id < 0 ){
             logger.error("ClientServicesImpl, Method: getClientById - La id del usuario es de valor negativo o 0");
-            //Errorhandler
+            throw new ClientBadRequestException();
         }
 
         /*
@@ -84,8 +80,8 @@ public class ClientServicesImpl implements IClientServices {
         if(clientFound.isPresent()){
               client = clientFound.get();
         }else{
-            logger.error("ClientServicesImpl, Method: getClientById - No existe cliente");
-            //Errorhandler
+            logger.error("ClientServicesImpl, Method: getClientById - No existe cliente con id: " + id);
+            throw new ClientNotFoundException(id);
         }
 
         return mapper.mapperClientToDto(client);
